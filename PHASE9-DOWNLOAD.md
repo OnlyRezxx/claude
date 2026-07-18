@@ -23,11 +23,12 @@ Installer akan:
 1. Menggabungkan lima bagian di `phase9-bootstrap/`.
 2. Mendekode arsip source.
 3. Memvalidasi SHA-256.
-4. Mengekstrak project.
-5. Menjalankan `npm install` dan `npm run setup:env`.
-6. Memasang dependency Python.
-7. Membuat ulang dataset nama.
-8. Menjalankan audit kualitas dataset.
+4. Menguji integritas arsip XZ.
+5. Mengekstrak project.
+6. Menjalankan `npm install` dan `npm run setup:env`.
+7. Memasang dependency Python.
+8. Membuat ulang dataset nama.
+9. Menjalankan audit kualitas dataset.
 
 Setelah selesai, buka PowerShell di project dan jalankan:
 
@@ -67,13 +68,13 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 ## Integritas arsip
 
-SHA-256 arsip hasil penggabungan:
+SHA-256 arsip hasil penggabungan dari lima bagian pada branch `main`:
 
 ```text
-bd8572ae5f7b6987b804e9cb68ba377cc1ce17f9d580d699b44a1390938d11d4
+05dfa50998cb0320cc81690bb75f84a103c6a3a7119dc1bea82d63428416c35e
 ```
 
-Installer menolak ekstraksi apabila checksum tidak cocok.
+Installer menolak ekstraksi apabila checksum tidak cocok atau pengujian struktur XZ gagal.
 
 ## Catatan dataset
 
