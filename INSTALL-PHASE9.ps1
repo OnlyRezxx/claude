@@ -10,7 +10,7 @@ $ChunkDirectory = Join-Path $Root 'phase9-bootstrap'
 $ArchivePath = Join-Path $Root 'Name-Guesser-Phase9-Source.tar.xz'
 $OutputDirectory = Join-Path $Root 'Name-Guesser-Phase9'
 $ProjectDirectory = Join-Path $OutputDirectory 'name-guesser-phase9'
-$ExpectedHash = 'bd8572ae5f7b6987b804e9cb68ba377cc1ce17f9d580d699b44a1390938d11d4'
+$ExpectedHash = '05dfa50998cb0320cc81690bb75f84a103c6a3a7119dc1bea82d63428416c35e'
 
 function Write-Step([string]$Message) {
     Write-Host "`n==> $Message" -ForegroundColor Cyan
@@ -64,15 +64,23 @@ Write-Step 'Memvalidasi checksum SHA-256'
 $ActualHash = (Get-FileHash -Path $ArchivePath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($ActualHash -ne $ExpectedHash) {
     Remove-Item $ArchivePath -Force -ErrorAction SilentlyContinue
-    throw "Checksum tidak cocok.`nDiharapkan: $ExpectedHash`nDidapatkan: $ActualHash`nUnduh ulang repository GitHub."
+    throw "Checksum tidak cocok.`nDiharapkan: $ExpectedHash`nDidapatkan: $ActualHash`nPastikan repository yang dipakai adalah versi terbaru dari branch main."
 }
 Write-Host "Checksum valid: $ActualHash" -ForegroundColor Green
 
-Write-Step 'Mengekstrak source project'
 if (-not (Get-Command tar.exe -ErrorAction SilentlyContinue)) {
     throw 'Perintah tar.exe tidak tersedia. Gunakan Windows 10/11 terbaru atau instal bsdtar/7-Zip.'
 }
 
+Write-Step 'Menguji integritas arsip XZ'
+& tar.exe -tJf $ArchivePath *> $null
+if ($LASTEXITCODE -ne 0) {
+    Remove-Item $ArchivePath -Force -ErrorAction SilentlyContinue
+    throw "Arsip XZ gagal diuji dengan exit code $LASTEXITCODE. Repository mungkin tidak lengkap."
+}
+Write-Host 'Struktur arsip valid.' -ForegroundColor Green
+
+Write-Step 'Mengekstrak source project'
 if (Test-Path $OutputDirectory) {
     Remove-Item $OutputDirectory -Recurse -Force
 }
